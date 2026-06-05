@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+茨大賞来場者用アンケート
+</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+background:#f5f3ee;
+
+font-family:
+"Yu Mincho",
+"Hiragino Mincho ProN",
+serif;
+
+color:#222;
+
+padding:20px;
+
+}
+
+.card{
+
+max-width:1100px;
+
+margin:40px auto;
+
+background:white;
+
+padding:40px;
+
+border:1px solid #d8d3ca;
+
+}
+
+.festival{
+
+text-align:center;
+
+letter-spacing:4px;
+
+color:#666;
+
+margin-bottom:15px;
+
+}
+
+h1{
+
+text-align:center;
+
+color:#1f365c;
+
+margin-bottom:25px;
+
+}
+
+.intro{
+
+text-align:center;
+
+line-height:2;
+
+margin-bottom:35px;
+
+}
+
+.question{
+
+font-weight:bold;
+
+margin-top:30px;
+
+margin-bottom:10px;
+
+color:#1f365c;
+
+}
+
+select{
+
+width:100%;
+
+padding:12px;
+
+font-size:15px;
+
+border:1px solid #cfc8bd;
+
+}
+
+.searchBox{
+
+width:100%;
+
+padding:12px;
+
+border:1px solid #cfc8bd;
+
+margin-bottom:20px;
+
+}
+
+button{
+
+width:100%;
+
+padding:14px;
+
+margin-top:25px;
+
+background:#1f365c;
+
+color:white;
+
+border:none;
+
+font-size:16px;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+opacity:.9;
+
+}
+
+#posterGrid{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fill,minmax(220px,1fr));
+
+gap:16px;
+
+margin-top:20px;
+
+}
+
+.poster-card{
+
+border:2px solid #ddd;
+
+cursor:pointer;
+
+background:white;
+
+transition:.2s;
+
+}
+
+.poster-card:hover{
+
+transform:translateY(-2px);
+
+}
+
+.poster-card.selected{
+
+border:4px solid #1f365c;
+
+}
+
+.poster-card img{
+
+width:100%;
+
+height:320px;
+
+object-fit:contain;
+
+background:white;
+
+padding:10px;
+
+}
+
+.poster-card p{
+
+padding:10px;
+
+font-size:14px;
+
+text-align:center;
+
+}
+
+#message{
+
+margin-top:20px;
+
+text-align:center;
+
+font-weight:bold;
+
+}
+
+@media(max-width:700px){
+
+.card{
+
+padding:20px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div
+id="homePage"
+class="card"
+>
+
+<div class="festival">
+茨祭
+</div>
+
+<h1>
+茨大賞来場者用アンケート
+</h1>
+
+<p class="intro">
+
+ご来場いただきありがとうございます。<br>
+
+茨大賞の企画投票およびポスター投票に<br>
+
+ご協力をお願いいたします。
+
+</p>
+
+<button onclick="startSurvey()">
+
+回答する
+
+</button>
+
+</div>
+
+<div
+id="surveyPage"
+class="card"
+style="display:none;"
+>
+
+<div class="question">
+
+1. 企画投票
+
+</div>
+
+<select id="projectVote"></select>
+
+<div class="question">
+
+2. ポスター投票
+
+</div>
+
+<input
+id="posterSearch"
+class="searchBox"
+placeholder="企画名・部活名で検索"
+>
+
+<div id="posterGrid"></div>
+
+<input
+type="hidden"
+id="posterVote"
+>
+
+<button onclick="submitVote()">
+
+投票する
+
+</button>
+
+<div id="message"></div>
+
+</div>
+
+<script>
+
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbxDAhxmkY88ZFabLTaAyKW1d16CDvDn0KA57jPvgtBlsC4ghgv4zmqAl32QO_sK1j2U/exec";
+
+function startSurvey(){
+
+document
+.getElementById("homePage")
+.style.display="none";
+
+document
+.getElementById("surveyPage")
+.style.display="block";
+
+}
+
+const projectOptions = [
+
+["1-A","1-A　３番出口"],
+["1-B","1-B　呪われたハマムラ研究所 ーずっといっしょだよ♡ー"],
+["1-C","1-C　Chihiro's Casino"],
+["1-D","1-D　ナカヤマの野望　〜シューティングアドベンチャー〜"],
+["1-E","1-E　８番出口"],
+["1-F","1-F　灯華縁日"],
+["1-G","1-G　ハラと雪の女王"],
+
+["2-A","2-A　ミッションインカベップル"],
+["2-B","2-B　２８年の呪い"],
+["2-C","2-C　TSUBOY STORY MANIA"],
+["2-D","2-D　パイレーツ・オブ・ヤスコ"],
+["2-E","2-E　ハラリン〜ドラマティック・フライト７７７〜"],
+["2-F","2-F　サバイバルゲーム(仮)"],
+["2-G","2-G　GLAC６期生 オンライン座談会"],
+
+["3-A","3-A　スーパー エンジュン ブラザーズ"],
+["3-B","3-B　けんじガン　〜War on the sky〜"],
+["3-C","3-C　GLAC HAZARD　〜感染区域〜"],
+["3-D","3-D　Room 240　〜生存確率0.00%〜"],
+["3-E","3-E　栗ニック"],
+["3-F","3-F　ASTRO MISSION"]
+
+];
+
+const posterOptions = [
+
+...projectOptions,
+
+["図書","図書委員とあそぼ〜図書館人狼・栞作り編〜"],
+["美術部","作品展示・ワークショップ"],
+["JRC部","スマイルクッキープロジェクト"],
+["フォーク部","軽音ライブ"],
+["史学部","「筑波道」に刻まれた記憶"],
+["吹奏楽部","吹奏楽部Pops Stage"],
+["ESS部","放課後シネマ @ESS"],
+["生物部","そうきたか！生物部"],
+["漫画研究部","追憶の欠片〜紡がれる2つの物語〜"],
+["放送部","カラオケ Chiki Ban! / 茨高放送部店"],
+["競技かるた部","競技かるたの札でそろえろ！かるたBINGO！"],
+["化学部","サイエンス・ワンダーランド"],
+["C研","ｳﾜｱｱｱｱ!C研ﾃﾞﾙｼﾞﾊﾞｾﾞﾖ!!"],
+["囲碁将棋部","茨高将棋道場"]
+
+];
+
+function fillProjectSelect(){
+
+const select =
+document.getElementById("projectVote");
+
+select.innerHTML =
+'<option value="">選択してください</option>';
+
+projectOptions.forEach(item=>{
+
+const option =
+document.createElement("option");
+
+option.value = item[0];
+
+option.textContent = item[1];
+
+select.appendChild(option);
+
+});
+
+}
+
+fillProjectSelect();
+
+const posterGrid =
+document.getElementById("posterGrid");
+
+function renderPosters(keyword=""){
+
+posterGrid.innerHTML = "";
+
+posterOptions
+
+.filter(item=>
+
+item[1]
+.toLowerCase()
+.includes(
+keyword.toLowerCase()
+)
+
+)
+
+.forEach(item=>{
+
+const card =
+document.createElement("div");
+
+card.className =
+"poster-card";
+
+card.innerHTML = `
+
+<img
+src="posters/${item[0]}.jpg"
+alt="${item[1]}"
+>
+
+<p>${item[1]}</p>
+
+`;
+
+card.onclick = ()=>{
+
+document
+.querySelectorAll(".poster-card")
+.forEach(c=>
+c.classList.remove("selected")
+);
+
+card.classList.add("selected");
+
+document
+.getElementById("posterVote")
+.value = item[0];
+
+};
+
+posterGrid
+.appendChild(card);
+
+});
+
+}
+
+renderPosters();
+
+document
+.getElementById("posterSearch")
+.addEventListener(
+"input",
+e=>{
+
+renderPosters(
+e.target.value
+);
+
+}
+);
+
+async function submitVote(){
+
+const projectVote =
+document
+.getElementById("projectVote")
+.value;
+
+const posterVote =
+document
+.getElementById("posterVote")
+.value;
+
+if(!projectVote){
+
+alert(
+"企画投票を選択してください"
+);
+
+return;
+
+}
+
+if(!posterVote){
+
+alert(
+"ポスター投票を選択してください"
+);
+
+return;
+
+}
+
+const url =
+
+SCRIPT_URL +
+
+"?project=" +
+
+encodeURIComponent(
+projectVote
+)
+
++
+
+"&poster=" +
+
+encodeURIComponent(
+posterVote
+);
+
+try{
+
+await fetch(
+url,
+{
+mode:"no-cors"
+}
+);
+
+document.body.innerHTML = `
+
+<div class="card">
+
+<div class="festival">
+
+茨祭
+
+</div>
+
+<h1>
+
+投票ありがとうございました
+
+</h1>
+
+<p class="intro">
+
+ご協力ありがとうございました。<br>
+
+茨祭をお楽しみください。
+
+</p>
+
+</div>
+
+`;
+
+}
+catch(err){
+
+document
+.getElementById("message")
+.innerText =
+
+"送信に失敗しました";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
